@@ -4,28 +4,28 @@ class Program
 {
     static void Main()
     {
-        var connectionString =
-            "Server=your-rds-endpoint.amazonaws.com;" +
-            "Port=3306;" +
-            "Database=hackmt;" +
-            "User ID=admin;" +
-            "Password=hackMT2026;" +
-            "SslMode=Required;";
+        DotNetEnv.Env.Load();
 
-        using var conn = new MySqlConnection(connectionString);
+        string endpoint = Environment.GetEnvironmentVariable("ENDPOINT");
+        string dbName = Environment.GetEnvironmentVariable("DB_NAME");
+        string userID = Environment.GetEnvironmentVariable("USER_ID");
+        string password = Environment.GetEnvironmentVariable("PASSWORD");
+
+        string connStr = $"Server={endpoint};Database={dbName};User ID={userID};Password={password};SslMode=Preferred;";
+        var conn = new MySqlConnection(connStr);
         conn.Open();
 
-        using var cmd = new MySqlCommand("SELECT * FROM player", conn);
-        using var reader = cmd.ExecuteReader();
+        var cmd = new MySqlCommand("SELECT * FROM player;", conn);
+        var reader = cmd.ExecuteReader();
 
         while (reader.Read())
         {
-            // Example: print all columns dynamically
             for (int i = 0; i < reader.FieldCount; i++)
-            {
-                Console.Write($"{reader.GetName(i)}={reader.GetValue(i)} ");
-            }
+                Console.Write($"{reader.GetName(i)}: {reader[i]}  ");
             Console.WriteLine();
         }
+
+        reader.Close();
+        conn.Close();
     }
 }
