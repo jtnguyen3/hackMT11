@@ -363,7 +363,7 @@ public class Database
         return pitcherStats;
     }
 
-    public List<Game> GetAllGames(int? gameId, int? homeTeamId, int? awayTeamId, int? season)
+    public List<Game> GetAllGames(int? gameId, int? homeTeamId, int? awayTeamId, string? season)
     {
         var games = new List<Game>();
 
@@ -417,10 +417,10 @@ public class Database
             cmd.Parameters.AddWithValue("@awayTeamId", awayTeamId.Value);
         }
 
-        if (season.HasValue)
+        if (!string.IsNullOrWhiteSpace(season))
         {
             cmdString += " AND (g.homeTeamSeason = @season OR g.awayTeamSeason = @season)";
-            cmd.Parameters.AddWithValue("@season", season.Value);
+            cmd.Parameters.AddWithValue("@season", season);
         }
 
         cmd.CommandText = cmdString;
@@ -449,5 +449,64 @@ public class Database
         }
 
         return games;
+    }
+
+    public Game GetGamesById(int? gameId, int? homeTeamId, int? awayTeamId, string? season)
+    {
+        using var conn = GetConnection();
+        conn.Open();
+
+        var cmd = new MySqlCommand();
+        cmd.Connection = conn;
+
+        string cmdString = @"
+            SELECT 
+                g.gameId,
+                g.gameDate,
+                
+                home.teamId AS HomeTeamId,
+                home.season AS HomeTeamSeason,
+                home.teamName AS HomeTeamName,
+                home.ageGroup AS HomeAgeGroup,
+
+                away.teamId AS AwayTeamId,
+                away.season AS AwayTeamSeason,
+                away.teamName AS AwayTeamName,
+                away.ageGroup AS AwayAgeGroup
+            FROM game g
+            JOIN team home 
+                ON g.homeTeamId = home.teamId 
+            AND g.homeTeamSeason = home.season
+            JOIN team away
+                ON g.awayTeamId = away.teamId 
+            AND g.awayTeamSeason = away.season
+            WHERE g.gameId = @gameId
+        ";
+
+        cmd.CommandText = cmdString;
+        cmd.Parameters.AddWithValue("@gameId", gameId);
+
+        using var reader = cmd.ExecuteReader();
+
+        if (reader.Read())
+        {
+            return new Game
+            {
+                GameId = reader.GetInt32("gameId"),
+                GameDate = reader.GetString("gameDate"),
+
+                HomeTeamId = reader.GetInt32("HomeTeamId"),
+                HomeTeamSeason = reader.GetString("HomeTeamSeason"),
+                HomeTeamName = reader.GetString("HomeTeamName"),
+                HomeAgeGroup = reader.GetString("HomeAgeGroup"),
+
+                AwayTeamId = reader.GetInt32("AwayTeamId"),
+                AwayTeamSeason = reader.GetString("AwayTeamSeason"),
+                AwayTeamName = reader.GetString("AwayTeamName"),
+                AwayAgeGroup = reader.GetString("AwayAgeGroup")
+            };
+        }
+
+        return null;
     }
 }

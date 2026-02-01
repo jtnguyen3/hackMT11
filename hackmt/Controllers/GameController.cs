@@ -15,9 +15,21 @@ public class GameController : Controller
 
     [HttpGet]
     [Route("games")]
-    public async Task<IActionResult> GetAllGames(int? gameId, int? homeTeamId, int? awayTeamId, int? season)
+    public async Task<IActionResult> GetAllGames(int? gameId, int? homeTeamId, int? awayTeamId, string? season)
     {
         var games = _gameService.GetAllGames(gameId, homeTeamId, awayTeamId, season);
+        return Ok(games);
+    }
+    
+    [HttpGet]
+    [Route("games/{gameId}")]
+    public async Task<IActionResult> GetGamesById(int? gameId, int? homeTeamId, int? awayTeamId, string? season)
+    {
+        var games = _gameService.GetGamesById(gameId, homeTeamId, awayTeamId, season);
+        if (games == null)
+        {
+            return NotFound();
+        }
         return Ok(games);
     }
 }

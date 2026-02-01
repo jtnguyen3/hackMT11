@@ -33,8 +33,12 @@ public class Service
         return _database.GetPitcherStatsById(pitcherId);
     }
 
-    public List<Game> GetAllGames(int? gameId, int? homeTeamId, int? awayTeamId, int? season)
+    public List<Game> GetAllGames(int? gameId, int? homeTeamId, int? awayTeamId, string? season)
     {
         return _database.GetAllGames(gameId, homeTeamId, awayTeamId, season);
+    }
+    public Game GetGamesById(int? gameId, int? homeTeamId, int? awayTeamId, string? season)
+    {
+        return _database.GetGamesById(gameId, homeTeamId, awayTeamId, season);
     }
 }
