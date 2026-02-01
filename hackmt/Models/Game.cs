@@ -1,19 +1,23 @@
-public class Game
-
+namespace HackMT2026.Models
 {
+    public class Game
 
-    public int GameID { get; set; }
+    {
+        public int GameId { get; set; }
+        public string GameDate { get; set; } = string.Empty;
 
-    public string Field { get; set; }
- 
-    public int HomeTeamID { get; set; }
+        // Home team
+        public int HomeTeamId { get; set; }
+        public int HomeTeamSeason { get; set; }
+        public string HomeTeamName { get; set; } = string.Empty;
+        public string HomeAgeGroup { get; set; } = string.Empty;
 
-    public string HomeTeamSeason { get; set; }
- 
-    public int AwayTeamID { get; set; }
-
-    public string AwayTeamSeason { get; set; }
+        // Away team
+        public int AwayTeamId { get; set; }
+        public int AwayTeamSeason { get; set; }
+        public string AwayTeamName { get; set; } = string.Empty;
+        public string AwayAgeGroup { get; set; } = string.Empty;
+    }
 
 }
 
- 
